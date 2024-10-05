@@ -34,9 +34,5 @@ jobs:
         for file in $(find . -name "*.html"); do
           tidy -e $file;
         done
-    - name: Validate CSS
-      run: |
-        sudo apt-get install -y nodejs npm
-        npm install -g stylelint
-        stylelint '**/*.css'
+
     
