@@ -1,7 +1,10 @@
-name: PHP Application Test
+name: Application Test
 
 on:
   pull_request:
+    branches:
+      - main
+  push:
     branches:
       - main
 
@@ -20,5 +23,15 @@ jobs:
 
     - name: Verify PHP Syntax
       run: php -l Index.php  
-      
+    
+    - name: Validate HTML
+      run: |
+        sudo apt-get install -y tidy
+        tidy -e *.html
+
+    - name: Validate CSS
+      run: |
+        sudo apt-get install -y nodejs npm
+        npm install -g stylelint
+        stylelint '**/*.css'
     
