@@ -19,28 +19,24 @@ jobs:
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 8.0
+        php-version: 8.0 
 
-    # PHP Syntax Check
+
     - name: Verify PHP Syntax
       run: |
         for file in $(find . -name "*.php"); do
           php -l $file;
         done
 
-    # HTML Validation
     - name: Validate HTML
       run: |
         sudo apt-get install -y tidy
         for file in $(find . -name "*.html"); do
           tidy -e $file;
         done
-
-    # CSS Validation
     - name: Validate CSS
       run: |
         sudo apt-get install -y nodejs npm
         npm install -g stylelint
-        for file in $(find . -name "*.css"); do
-          stylelint $file;
-        done
+        stylelint '**/*.css'
+    
