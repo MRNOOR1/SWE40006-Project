@@ -10,24 +10,36 @@
     <div class="dashboard-container">
         <h2>Student Dashboard</h2>
 
+        <!-- Logout Button -->
+        <div class="logout-container" style="text-align: right;">
+            <form action="logout.php" method="POST">
+                <button type="submit" class="logout-button">Logout</button>
+            </form>
+        </div>
+
         <!-- Announcements List -->
         <div class="announcement-list">
             <h3>Your Course Announcements</h3>
-
-            <!-- Example of an announcement block -->
-            <div class="announcement-item">
-                <p><strong>Course:</strong> CSC101</p>
-                <p><strong>Announcement:</strong> The next lecture will cover Chapter 5.</p>
-                <p><strong>Posted on:</strong> 2024-09-16</p>
-            </div>
-
-            <!-- Additional announcements would be listed here -->
-            <div class="announcement-item">
-                <p><strong>Course:</strong> CSC101</p>
-                <p><strong>Announcement:</strong> Reminder: The midterm exam is scheduled for next Monday.</p>
-                <p><strong>Posted on:</strong> 2024-09-14</p>
-            </div>
+            <div id="announcements-container"></div>
         </div>
     </div>
+
+    <script>
+        // Fetch announcements from PHP
+        fetch('get_announcements.php')
+            .then(response => response.json())
+            .then(data => {
+                const announcementsContainer = document.getElementById('announcements-container');
+                data.forEach(announcement => {
+                    const div = document.createElement('div');
+                    div.classList.add('announcement-item');
+                    div.innerHTML = `<p><strong>Course:</strong> ${announcement.course_code}</p>
+                                     <p><strong>Announcement:</strong> ${announcement.text}</p>
+                                     <p><strong>Posted on:</strong> ${announcement.time}</p>`;
+                    announcementsContainer.appendChild(div);
+                });
+            })
+            .catch(error => console.error('Error fetching announcements:', error));
+    </script>
 </body>
 </html>
