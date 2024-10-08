@@ -1,4 +1,4 @@
-name: Application Test
+name: Inital tests
 
 on:
   pull_request:
