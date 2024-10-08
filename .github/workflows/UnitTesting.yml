@@ -1,4 +1,4 @@
-name: Run PHPUnit Tests
+name: Validate Composer and Run PHPUnit Tests
 
 on:
   push:
@@ -18,13 +18,27 @@ jobs:
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 8.2  # Or whichever PHP version your project requires
-        extensions: mbstring, pdo, pdo_mysql  # Include any PHP extensions your tests need
+        php-version: 8.2
+        extensions: mbstring, pdo, pdo_mysql
 
-    # Step 3: Install dependencies
+    # Step 3: Validate composer.json and composer.lock
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    # Step 4: Cache Composer packages
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    # Step 5: Install dependencies
     - name: Install dependencies
-      run: composer install --no-progress --prefer-dist
+      run: composer install --prefer-dist --no-progress
 
-    # Step 4: Run PHPUnit tests
+    # Step 6: Run PHPUnit tests
     - name: Run PHPUnit tests
       run: vendor/bin/phpunit --coverage-text
