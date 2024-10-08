@@ -1,27 +1,44 @@
-name: Run PHPUnit After Initial Tests
+name: Validate Composer and Run PHPUnit Tests
 
 on:
-  workflow_run:
-    workflows: ["Initial tests"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
   phpunit_tests:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout the code
     - name: Checkout code
       uses: actions/checkout@v2
 
+    # Step 2: Set up PHP
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: 8.0
         extensions: mbstring, pdo, pdo_mysql
 
-    - name: Install dependencies
-      run: composer install
+    # Step 3: Validate composer.json and composer.lock
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
 
+    # Step 4: Cache Composer packages
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    # Step 5: Install dependencies
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    # Step 6: Run PHPUnit tests
     - name: Run PHPUnit tests
       run: vendor/bin/phpunit --coverage-text
