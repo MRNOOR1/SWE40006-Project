@@ -53,4 +53,4 @@ jobs:
 
     # Step 9: Run PHPUnit tests
     - name: Run PHPUnit tests
-      run: vendor/bin/phpunit --coverage-text --testdox
+      run: vendor/bin/phpunit --coverage-text --testdox tests/
