@@ -6,7 +6,7 @@ class ProcessTest extends TestCase
 {
     protected function setUp(): void
     {
-        // This will reset the $_POST and $_SESSION superglobals before each test
+        // Reset the $_POST and $_SESSION superglobals before each test
         $_POST = [];
         $_SESSION = [];
     }
@@ -22,7 +22,7 @@ class ProcessTest extends TestCase
         $mockedUser = [
             'id' => 1,
             'username' => 'student1',
-            'password' => 'password123',  // This should normally be a hashed password in practice
+            'password' => 'password123',  // In practice, this should be hashed
             'type' => 'S', // Indicates student type
         ];
 
@@ -33,7 +33,7 @@ class ProcessTest extends TestCase
         $this->assertTrue($loginSuccess);
         // Assert that the session contains the correct user information
         $this->assertEquals(1, $_SESSION['user_id']);
-        $this->assertEquals('student', $_SESSION['user_type']);
+        $this->assertEquals('S', $_SESSION['user_type']);  // Correct user type
     }
 
     // Test the announcement creation process
@@ -50,14 +50,53 @@ class ProcessTest extends TestCase
         $this->assertTrue($announcementCreated);
     }
 
+    // Test login failure due to invalid password
+    public function testLoginFailureInvalidPassword()
+    {
+        // Mock POST data for a failed login attempt
+        $_POST['username'] = 'student1';
+        $_POST['password'] = 'wrongpassword';
+
+        // Simulate expected user details fetched from the database
+        $mockedUser = [
+            'id' => 1,
+            'username' => 'student1',
+            'password' => 'password123',  // Correct password is different
+            'type' => 'S',
+        ];
+
+        // Simulate the login function
+        $loginSuccess = $this->simulateLogin($_POST['username'], $_POST['password'], $mockedUser);
+
+        // Assert that login fails
+        $this->assertFalse($loginSuccess);
+    }
+
+    // Test login failure due to non-existent user
+    public function testLoginFailureNoUser()
+    {
+        // Mock POST data for a failed login attempt
+        $_POST['username'] = 'nonexistentuser';
+        $_POST['password'] = 'password123';
+
+        // Simulate no user found in the database
+        $mockedUser = null;
+
+        // Simulate the login function
+        $loginSuccess = $this->simulateLogin($_POST['username'], $_POST['password'], $mockedUser);
+
+        // Assert that login fails
+        $this->assertFalse($loginSuccess);
+    }
+
     // Simulate the login function
     private function simulateLogin($username, $password, $userFromDB)
     {
-        // In a real application, you would fetch the user from the database and compare the password
-        if ($username === $userFromDB['username'] && $password === $userFromDB['password']) {
+        // Check if the user exists and the password is correct
+        if ($userFromDB && $username === $userFromDB['username'] && $password === $userFromDB['password']) {
             // Set session for logged-in user
             $_SESSION['user_id'] = $userFromDB['id'];
-            $_SESSION['user_type'] = $userFromDB['type'] === 'S' ? 'student' : 'teacher';
+            $_SESSION['user_type'] = $userFromDB['type']; // 'S' for student, 'T' for teacher
             return true;
         }
         return false;
@@ -66,7 +105,7 @@ class ProcessTest extends TestCase
     // Simulate the announcement creation function
     private function simulateAnnouncementCreation($course, $announcementText)
     {
-        // In a real application, this would involve inserting the announcement into the database
+        // Simulate a successful announcement creation
         if (!empty($course) && !empty($announcementText)) {
             return true; // Simulate successful insertion
         }
