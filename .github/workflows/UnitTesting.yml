@@ -51,6 +51,11 @@ jobs:
     - name: List vendor directory
       run: ls -la vendor/phpunit/phpunit/src/
 
-    # Step 9: Run PHPUnit tests
+   # Step 9: Run PHPUnit tests
     - name: Run PHPUnit tests
-      run: vendor/bin/phpunit --coverage-text --testdox tests/
+      run: |
+        vendor/bin/phpunit --coverage-text --testdox tests/ProcessTest.php
+        vendor/bin/phpunit --coverage-text --testdox tests/GetAnnouncementsTest.php
+        vendor/bin/phpunit --coverage-text --testdox tests/LogoutTest.php
+        vendor/bin/phpunit --coverage-text --testdox tests/GetTeacherTest.php
+
