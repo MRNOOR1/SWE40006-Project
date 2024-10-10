@@ -2,6 +2,9 @@
 
 use PHPUnit\Framework\TestCase;
 
+
+require_once './source/get_teacher.php';
+
 class TeacherTest extends TestCase
 {
     private $conn;

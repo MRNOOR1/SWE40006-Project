@@ -44,7 +44,7 @@
 
     <script>
         // Fetch the courses for the logged-in teacher and populate the course dropdown
-        fetch('get_teacher.php?action=get_courses')
+        fetch('./get_teacher.php?action=get_courses')
             .then(response => response.json())
             .then(data => {
                 const courseSelect = document.getElementById('course');
@@ -59,7 +59,7 @@
 
         // Fetch announcements and display them
         function loadAnnouncements() {
-            fetch('get_teacher.php?action=get_announcements')
+            fetch('./get_teacher.php?action=get_announcements')
                 .then(response => response.json())
                 .then(data => {
                     const announcementListContainer = document.getElementById('announcement-list-container');
@@ -83,7 +83,7 @@
         document.getElementById('create-announcement-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(this);
-            fetch('get_teacher.php?action=create_announcement', {
+            fetch('./get_teacher.php?action=create_announcement', {
                 method: 'POST',
                 body: formData
             })
