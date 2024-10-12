@@ -11,7 +11,7 @@ CREATE TABLE `announcements` (
   `text` text NOT NULL,
   `time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `teacher_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table `announcements`
 INSERT INTO `announcements` (`id`, `course_code`, `text`, `time`, `teacher_id`) VALUES
@@ -28,7 +28,7 @@ INSERT INTO `announcements` (`id`, `course_code`, `text`, `time`, `teacher_id`) 
 CREATE TABLE `courses` (
   `course_code` varchar(25) NOT NULL,
   `course_name` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table `courses`
 INSERT INTO `courses` (`course_code`, `course_name`) VALUES
@@ -45,7 +45,7 @@ CREATE TABLE `users` (
   `username` text NOT NULL,
   `password` text NOT NULL,
   `type` char(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table `users`
 INSERT INTO `users` (`id`, `username`, `password`, `type`) VALUES
@@ -68,7 +68,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `type`) VALUES
 CREATE TABLE `user_courses` (
   `course_code` varchar(25) NOT NULL,
   `user_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table `user_courses`
 INSERT INTO `user_courses` (`course_code`, `user_id`) VALUES

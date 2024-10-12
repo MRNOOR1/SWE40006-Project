@@ -3,7 +3,6 @@
 use PHPUnit\Framework\TestCase;
 
 
-require_once './source/get_teacher.php';
 
 class TeacherTest extends TestCase
 {
@@ -13,6 +12,7 @@ class TeacherTest extends TestCase
     {
         // Mock session for teacher login
         $_SESSION['user_id'] = 1;
+        require_once './source/get_teacher.php';
 
         // Create a mock database connection
         $this->conn = $this->createMock(mysqli::class);

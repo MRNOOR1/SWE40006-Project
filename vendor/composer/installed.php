@@ -3,7 +3,7 @@
         'name' => 'your-vendor/cicd-pipeline',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '23eb21a625371173194edc6342981c0627df9efd',
+        'reference' => '9295e2178313af161126f10c760c95f1c656dd7f',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -247,7 +247,7 @@
         'your-vendor/cicd-pipeline' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '23eb21a625371173194edc6342981c0627df9efd',
+            'reference' => '9295e2178313af161126f10c760c95f1c656dd7f',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
