@@ -74,7 +74,7 @@ jobs:
         DB_USERNAME: root
         DB_PASSWORD: password
       run: |
-        vendor/bin/phpunit --coverage-text --testdox -- debug tests/ProcessTest.php
-        vendor/bin/phpunit --coverage-text --testdox -- debug tests/GetAnnouncementsTest.php
-        vendor/bin/phpunit --coverage-text --testdox -- debug tests/LogoutTest.php
-        vendor/bin/phpunit --coverage-text --testdox -- debug tests/GetTeacherTest.php
+        vendor/bin/phpunit --coverage-text --testdox --debug tests/ProcessTest.php
+        vendor/bin/phpunit --coverage-text --testdox --debug tests/GetAnnouncementsTest.php
+        vendor/bin/phpunit --coverage-text --testdox --debug tests/LogoutTest.php
+        vendor/bin/phpunit --coverage-text --testdox --debug tests/GetTeacherTest.php
