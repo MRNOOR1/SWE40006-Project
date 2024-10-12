@@ -9,6 +9,22 @@ jobs:
   phpunit_tests:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: swe40006
+          MYSQL_USER: root
+          MYSQL_PASSWORD: password
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
     steps:
     # Step 1: Checkout the code
     - name: Checkout code
@@ -19,7 +35,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: 8.2
-        extensions: mbstring, pdo, pdo_mysql
+        extensions: mbstring, pdo, pdo_mysql, mysqli
 
     # Step 3: Validate composer.json and composer.lock
     - name: Validate composer.json and composer.lock
@@ -51,11 +67,16 @@ jobs:
     - name: List vendor directory
       run: ls -la vendor/phpunit/phpunit/src/
 
-   # Step 9: Run PHPUnit tests
+    # Step 9: Run PHPUnit tests
     - name: Run PHPUnit tests
+      env:
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_DATABASE: swe40006
+        DB_USERNAME: root
+        DB_PASSWORD: password
       run: |
         vendor/bin/phpunit --coverage-text --testdox tests/ProcessTest.php
         vendor/bin/phpunit --coverage-text --testdox tests/GetAnnouncementsTest.php
         vendor/bin/phpunit --coverage-text --testdox tests/LogoutTest.php
         vendor/bin/phpunit --coverage-text --testdox tests/GetTeacherTest.php
-
