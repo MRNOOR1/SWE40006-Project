@@ -112,5 +112,3 @@ switch ($action) {
 
 // Close the database connection
 $conn->close();
-
-?>

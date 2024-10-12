@@ -6,10 +6,11 @@ class LogoutTest extends TestCase
 {
     protected function setUp(): void
     {
-        // Start a session before each test
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+        // Ensure that any active session is destroyed before starting a new one
+        if (session_status() !== PHP_SESSION_NONE) {
+            session_destroy(); // End any active session before starting a new one
         }
+        //session_start(); // Start a new session for the test
     }
 
     public function testLogoutSuccess()
@@ -70,3 +71,4 @@ class LogoutTest extends TestCase
         $this->assertEquals(PHP_SESSION_NONE, session_status(), 'Session should not be active after logout without a session.');
     }
 }
+
