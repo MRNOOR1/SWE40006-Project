@@ -19,7 +19,6 @@ if (!isset($_SESSION['user_id'])) {
     // Determine which action to perform
     $action = isset($_GET['action']) ? $_GET['action'] : null;
 
-
     // Route the request based on the action parameter
     switch ($action) {
         case 'get_courses':
@@ -45,6 +44,7 @@ if (!isset($_SESSION['user_id'])) {
         default:
             echo "Invalid action.";
     }
+
+    // Close the database connection
+    $conn->close();
 }
-// Close the database connection
-$conn->close();

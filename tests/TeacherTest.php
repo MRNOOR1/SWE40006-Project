@@ -1,8 +1,5 @@
-<?php
-
+<?php 
 use PHPUnit\Framework\TestCase;
-
-
 
 class TeacherTest extends TestCase
 {
@@ -15,8 +12,19 @@ class TeacherTest extends TestCase
         $_SESSION['user_id'] = 1;
         require_once './source/teacher_functions.inc';
 
-        // Create a mock database connection
+        // Mock the mysqli connection, statement, and result
         $this->conn = $this->createMock(mysqli::class);
+
+        // Mock prepared statements and related calls
+        $stmt = $this->createMock(mysqli_stmt::class);
+        $this->conn->method('prepare')->willReturn($stmt);
+
+        // Include the main code where the functions are defined
+        require_once './source/get_teacher.php'; // Adjust the path
+
+        // Bypass real connection creation in the file by using the mock connection
+        global $conn;
+        $conn = $this->conn; // Inject the mock connection into teacher.php
     }
 
     protected function tearDown(): void
@@ -31,7 +39,7 @@ class TeacherTest extends TestCase
 
     public function testFetchTeacherCoursesSuccess()
     {
-        // Mock the prepared statement and result
+        // Mock the statement and result set
         $stmt = $this->createMock(mysqli_stmt::class);
         $stmt->expects($this->once())->method('bind_param');
         $stmt->expects($this->once())->method('execute');
@@ -44,15 +52,17 @@ class TeacherTest extends TestCase
         $stmt->method('get_result')->willReturn($result);
         $this->conn->method('prepare')->willReturn($stmt);
 
-        // Call the fetchCourses function
-        ob_start();  // Start output buffering to capture the output
-        fetchCourses($this->conn, $_SESSION['user_id']);
-        $output = ob_get_clean();  // Get the output and end buffering
+        // Capture the output of fetchCourses
+        ob_start();
+        fetchCourses($this->conn, $_SESSION['user_id']);  // Use the mock connection
+        $output = ob_get_clean();
 
-        // Assert the JSON response matches expected result
+        // Assert the expected output
         $expectedOutput = json_encode([['course_code' => 'CSC101', 'course_name' => 'Introduction to Computer Science']]);
         $this->assertJsonStringEqualsJsonString($expectedOutput, $output);
     }
+
+
 
     public function testFetchAnnouncementsSuccess()
     {
@@ -60,24 +70,24 @@ class TeacherTest extends TestCase
         $stmt = $this->createMock(mysqli_stmt::class);
         $stmt->expects($this->once())->method('bind_param');
         $stmt->expects($this->once())->method('execute');
-
+        
         $result = $this->createMock(mysqli_result::class);
         $result->method('fetch_all')->willReturn([
             ['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']
         ]);
-
+        
         $stmt->method('get_result')->willReturn($result);
         $this->conn->method('prepare')->willReturn($stmt);
 
-        // Call the fetchAnnouncements function
-        ob_start();  // Start output buffering to capture the output
-        fetchAnnouncements($this->conn, $_SESSION['user_id']);
-        $output = ob_get_clean();  // Get the output and end buffering
+    // Call the fetchAnnouncements function
+    ob_start();  // Start output buffering to capture the output
+    fetchAnnouncements($this->conn, $_SESSION['user_id']);
+    $output = ob_get_clean();  // Get the output and end buffering
 
-        // Assert the JSON response matches expected result
-        $expectedOutput = json_encode([['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']]);
-        $this->assertJsonStringEqualsJsonString($expectedOutput, $output);
-    }
+    // Assert the JSON response matches expected result
+    $expectedOutput = json_encode([['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']]);
+    $this->assertJsonStringEqualsJsonString($expectedOutput, $output);
+}
 
     public function testCreateAnnouncementSuccess()
     {
