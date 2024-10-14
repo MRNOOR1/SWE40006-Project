@@ -13,11 +13,21 @@ class TeacherTest extends TestCase
         session_start();
         // Mock session for teacher login
         $_SESSION['user_id'] = 1;
-        require_once './source/get_teacher.php';
+        require_once './source/teacher_functions.inc';
 
         // Create a mock database connection
         $this->conn = $this->createMock(mysqli::class);
     }
+
+    protected function tearDown(): void
+    {
+        // Clear session and superglobals after each test
+        session_destroy();
+        $_SESSION = [];
+        $_GET = [];
+        $_POST = [];
+    }
+
 
     public function testFetchTeacherCoursesSuccess()
     {
@@ -25,12 +35,12 @@ class TeacherTest extends TestCase
         $stmt = $this->createMock(mysqli_stmt::class);
         $stmt->expects($this->once())->method('bind_param');
         $stmt->expects($this->once())->method('execute');
-        
+
         $result = $this->createMock(mysqli_result::class);
         $result->method('fetch_all')->willReturn([
             ['course_code' => 'CSC101', 'course_name' => 'Introduction to Computer Science']
         ]);
-        
+
         $stmt->method('get_result')->willReturn($result);
         $this->conn->method('prepare')->willReturn($stmt);
 
@@ -50,12 +60,12 @@ class TeacherTest extends TestCase
         $stmt = $this->createMock(mysqli_stmt::class);
         $stmt->expects($this->once())->method('bind_param');
         $stmt->expects($this->once())->method('execute');
-        
+
         $result = $this->createMock(mysqli_result::class);
         $result->method('fetch_all')->willReturn([
             ['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']
         ]);
-        
+
         $stmt->method('get_result')->willReturn($result);
         $this->conn->method('prepare')->willReturn($stmt);
 
@@ -112,15 +122,23 @@ class TeacherTest extends TestCase
 
     public function testUnauthorizedAccess()
     {
-        // Simulate a scenario where the session does not contain a user_id
-        session_destroy(); // Clear session data
+        // Simulate no user being logged in by destroying the session
+        session_destroy();
 
-        // Capture the output if the user is unauthorized
+        // Simulate the GET request for announcements
+        $_GET['action'] = 'get_announcements';
+
         ob_start();
-        fetchAnnouncements($this->conn, 1);
-        $output = ob_get_clean();
-        ob_end_clean();
+        require "./source/get_teacher.php";
+        // Capture the output if the user is unauthorized
+        $output = ob_get_clean();  // Capture the output and clean the buffer
+
         // Assert unauthorized message is displayed
         $this->assertEquals("Unauthorized access. Please login.", $output);
+
+        // Ensure the output buffer is cleaned up
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
     }
 }
