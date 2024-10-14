@@ -7,8 +7,10 @@ class TeacherTest extends TestCase
 
     protected function setUp(): void
     {
+        session_start();
         // Mock session for teacher login
         $_SESSION['user_id'] = 1;
+        require_once './source/teacher_functions.inc';
 
         // Mock the mysqli connection, statement, and result
         $this->conn = $this->createMock(mysqli::class);
@@ -24,6 +26,16 @@ class TeacherTest extends TestCase
         global $conn;
         $conn = $this->conn; // Inject the mock connection into teacher.php
     }
+
+    protected function tearDown(): void
+    {
+        // Clear session and superglobals after each test
+        session_destroy();
+        $_SESSION = [];
+        $_GET = [];
+        $_POST = [];
+    }
+
 
     public function testFetchTeacherCoursesSuccess()
     {
@@ -53,19 +65,19 @@ class TeacherTest extends TestCase
 
 
     public function testFetchAnnouncementsSuccess()
-{
-    // Mock the prepared statement and result
-    $stmt = $this->createMock(mysqli_stmt::class);
-    $stmt->expects($this->once())->method('bind_param');
-    $stmt->expects($this->once())->method('execute');
-
-    $result = $this->createMock(mysqli_result::class);
-    $result->method('fetch_all')->willReturn([
-        ['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']
-    ]);
-
-    $stmt->method('get_result')->willReturn($result);
-    $this->conn->method('prepare')->willReturn($stmt);
+    {
+        // Mock the prepared statement and result
+        $stmt = $this->createMock(mysqli_stmt::class);
+        $stmt->expects($this->once())->method('bind_param');
+        $stmt->expects($this->once())->method('execute');
+        
+        $result = $this->createMock(mysqli_result::class);
+        $result->method('fetch_all')->willReturn([
+            ['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']
+        ]);
+        
+        $stmt->method('get_result')->willReturn($result);
+        $this->conn->method('prepare')->willReturn($stmt);
 
     // Call the fetchAnnouncements function
     ob_start();  // Start output buffering to capture the output
@@ -120,17 +132,23 @@ class TeacherTest extends TestCase
 
     public function testUnauthorizedAccess()
     {
-        // Simulate a scenario where the session does not contain a user_id
-        $_SESSION = []; // Clear session data
+        // Simulate no user being logged in by destroying the session
+        session_destroy();
 
-        // Capture the output if the user is unauthorized
+        // Simulate the GET request for announcements
+        $_GET['action'] = 'get_announcements';
+
         ob_start();
-        if (!isset($_SESSION['user_id'])) {
-            echo "Unauthorized access. Please login.";
-        }
-        $output = ob_get_clean();
+        require "./source/get_teacher.php";
+        // Capture the output if the user is unauthorized
+        $output = ob_get_clean();  // Capture the output and clean the buffer
 
         // Assert unauthorized message is displayed
         $this->assertEquals("Unauthorized access. Please login.", $output);
+
+        // Ensure the output buffer is cleaned up
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
     }
 }
