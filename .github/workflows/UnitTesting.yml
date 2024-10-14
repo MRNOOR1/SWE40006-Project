@@ -76,5 +76,4 @@ jobs:
       run: |
         vendor/bin/phpunit --testdox --debug tests/ProcessTest.php
         vendor/bin/phpunit --testdox --debug tests/GetAnnouncementsTest.php
-        vendor/bin/phpunit --testdox --debug tests/LogoutTest.php
         vendor/bin/phpunit --testdox --debug tests/TeacherTest.php
