@@ -1,12 +1,52 @@
-name: Validate Composer and Run PHPUnit Tests
-
+name: CI CD PIPELINE
 on:
+  pull_request:
+    branches:
+      - main 
   push:
     branches:
-      - main
+      - main 
 
 jobs:
-  phpunit_tests:
+   Build_server:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2 
+
+
+    - name: Verify PHP Syntax
+      run: |
+        for file in $(find . -name "*.php"); do
+          php -l $file;
+        done
+
+    - name: Validate HTML
+      run: |
+        sudo apt-get install -y tidy
+        for file in $(find . -name "*.html"); do
+          tidy -e $file;
+        done
+        - name: Install Node.js and stylelint
+        run: |
+          sudo apt-get install -y nodejs npm
+          npm install -g stylelint stylelint-config-standard
+      
+    - name: Validate CSS
+      run: |
+        for file in $(find . -name "*.css"); do
+            stylelint $file;
+          done
+  
+   Testing_server:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     services:
@@ -77,3 +117,12 @@ jobs:
         vendor/bin/phpunit --testdox --debug tests/ProcessTest.php
         vendor/bin/phpunit --testdox --debug tests/GetAnnouncementsTest.php
         vendor/bin/phpunit --testdox --debug tests/TeacherTest.php
+
+   Porduction_server:
+     runs-on: ubuntu-latest
+     steps:
+      - name: Do Nothing
+        run: echo "This job does nothing."
+
+      
+    
