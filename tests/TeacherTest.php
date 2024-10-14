@@ -10,6 +10,7 @@ class TeacherTest extends TestCase
 
     protected function setUp(): void
     {
+        session_start();
         // Mock session for teacher login
         $_SESSION['user_id'] = 1;
         require_once './source/get_teacher.php';
@@ -112,15 +113,13 @@ class TeacherTest extends TestCase
     public function testUnauthorizedAccess()
     {
         // Simulate a scenario where the session does not contain a user_id
-        $_SESSION = []; // Clear session data
+        session_destroy(); // Clear session data
 
         // Capture the output if the user is unauthorized
         ob_start();
-        if (!isset($_SESSION['user_id'])) {
-            echo "Unauthorized access. Please login.";
-        }
+        fetchAnnouncements($this->conn, 1);
         $output = ob_get_clean();
-
+        ob_end_clean();
         // Assert unauthorized message is displayed
         $this->assertEquals("Unauthorized access. Please login.", $output);
     }
