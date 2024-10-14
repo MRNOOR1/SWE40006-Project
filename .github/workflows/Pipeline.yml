@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   Build_server:
     if: github.event_name == 'pull_request' || github.event_name == 'push'
@@ -28,7 +29,7 @@ jobs:
           for file in $(find . -name "*.html"); do
             tidy -e $file;
           done
-          
+
   Testing_server:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -88,10 +89,27 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@3.27.181.69 'bash -s' < deploy_script.sh
+          ssh -o StrictHostKeyChecking=no ec2-user@3.27.181.69 << 'EOF'
+            set -e
+
+            cd /var/www/html/cicd-pipeline
+            
+            echo "Pull the latest changes"
+            git pull origin main
+          
+            echo "Update Composer dependencies"
+            composer install --prefer-dist --no-progress
+
+            echo "Restart web server"
+            sudo systemctl restart httpd  
+
+            echo "Deployment completed successfully."
+          EOF
