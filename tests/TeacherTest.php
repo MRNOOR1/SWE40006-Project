@@ -1,4 +1,4 @@
-<?php 
+<?php
 use PHPUnit\Framework\TestCase;
 
 class TeacherTest extends TestCase
@@ -8,103 +8,106 @@ class TeacherTest extends TestCase
     protected function setUp(): void
     {
         session_start();
-        // Mock session for teacher login
         $_SESSION['user_id'] = 1;
-        require_once './source/teacher_functions.inc';
-
-        // Mock the mysqli connection, statement, and result
+        require_once "./source/teacher_functions.inc";
+        // Mock the mysqli connection
         $this->conn = $this->createMock(mysqli::class);
-
-        // Mock prepared statements and related calls
-        $stmt = $this->createMock(mysqli_stmt::class);
-        $this->conn->method('prepare')->willReturn($stmt);
-
-        // Include the main code where the functions are defined
-        require_once './source/get_teacher.php'; // Adjust the path
-
-        // Bypass real connection creation in the file by using the mock connection
-        global $conn;
-        $conn = $this->conn; // Inject the mock connection into teacher.php
     }
 
     protected function tearDown(): void
     {
-        // Clear session and superglobals after each test
         session_destroy();
         $_SESSION = [];
         $_GET = [];
         $_POST = [];
     }
 
-
     public function testFetchTeacherCoursesSuccess()
     {
-        // Mock the statement and result set
+        // Create a mock statement object
         $stmt = $this->createMock(mysqli_stmt::class);
-        $stmt->expects($this->once())->method('bind_param');
-        $stmt->expects($this->once())->method('execute');
-
         $result = $this->createMock(mysqli_result::class);
-        $result->method('fetch_all')->willReturn([
+
+        // Mock the database interaction
+        $this->conn->expects($this->once())
+            ->method('prepare')
+            ->with($this->equalTo('SELECT course_code, course_name FROM courses WHERE course_code IN (SELECT course_code FROM user_courses WHERE user_id = ?)'))
+            ->willReturn($stmt);
+
+        $stmt->expects($this->once())->method('bind_param')->with('i', $_SESSION['user_id']);
+        $stmt->expects($this->once())->method('execute');
+        $stmt->expects($this->once())->method('get_result')->willReturn($result);
+
+        $result->expects($this->once())->method('fetch_all')->with(MYSQLI_ASSOC)->willReturn([
             ['course_code' => 'CSC101', 'course_name' => 'Introduction to Computer Science']
         ]);
 
-        $stmt->method('get_result')->willReturn($result);
-        $this->conn->method('prepare')->willReturn($stmt);
-
-        // Capture the output of fetchCourses
+        // Capture the output
         ob_start();
-        fetchCourses($this->conn, $_SESSION['user_id']);  // Use the mock connection
+        fetchCourses($this->conn, $_SESSION['user_id']);
         $output = ob_get_clean();
 
-        // Assert the expected output
+        // Expected output
         $expectedOutput = json_encode([['course_code' => 'CSC101', 'course_name' => 'Introduction to Computer Science']]);
+
         $this->assertJsonStringEqualsJsonString($expectedOutput, $output);
     }
 
-
-
     public function testFetchAnnouncementsSuccess()
     {
-        // Mock the prepared statement and result
+        // Create a mock statement object
         $stmt = $this->createMock(mysqli_stmt::class);
-        $stmt->expects($this->once())->method('bind_param');
-        $stmt->expects($this->once())->method('execute');
-        
         $result = $this->createMock(mysqli_result::class);
-        $result->method('fetch_all')->willReturn([
+
+        // Mock the database interaction
+        $this->conn->expects($this->once())
+            ->method('prepare')
+            ->with($this->equalTo('SELECT id, course_code, text, time FROM announcements WHERE teacher_id = ? ORDER BY time DESC'))
+            ->willReturn($stmt);
+
+        $stmt->expects($this->once())->method('bind_param')->with('i', $_SESSION['user_id']);
+        $stmt->expects($this->once())->method('execute');
+        $stmt->expects($this->once())->method('get_result')->willReturn($result);
+
+        $result->expects($this->once())->method('fetch_all')->with(MYSQLI_ASSOC)->willReturn([
             ['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']
         ]);
-        
-        $stmt->method('get_result')->willReturn($result);
-        $this->conn->method('prepare')->willReturn($stmt);
 
-    // Call the fetchAnnouncements function
-    ob_start();  // Start output buffering to capture the output
-    fetchAnnouncements($this->conn, $_SESSION['user_id']);
-    $output = ob_get_clean();  // Get the output and end buffering
+        // Capture the output
+        ob_start();
+        fetchAnnouncements($this->conn, $_SESSION['user_id']);
+        $output = ob_get_clean();
 
-    // Assert the JSON response matches expected result
-    $expectedOutput = json_encode([['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']]);
-    $this->assertJsonStringEqualsJsonString($expectedOutput, $output);
-}
+        // Expected output
+        $expectedOutput = json_encode([
+            ['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']
+        ]);
+
+        $this->assertJsonStringEqualsJsonString($expectedOutput, $output);
+    }
 
     public function testCreateAnnouncementSuccess()
     {
-        // Mock the POST request data
+        // Mock POST request data
         $_POST['course'] = 'CSC101';
         $_POST['announcement_text'] = 'Final exam is scheduled for next week.';
 
-        // Mock the prepared statement
+        // Create a mock statement object
         $stmt = $this->createMock(mysqli_stmt::class);
-        $stmt->expects($this->once())->method('bind_param');
-        $stmt->expects($this->once())->method('execute')->willReturn(true);
-        $this->conn->method('prepare')->willReturn($stmt);
 
-        // Call the createAnnouncement function
-        ob_start();  // Start output buffering to capture the output
+        // Mock the database interaction
+        $this->conn->expects($this->once())
+            ->method('prepare')
+            ->with($this->equalTo('INSERT INTO announcements (course_code, text, time, teacher_id) VALUES (?, ?, NOW(), ?)'))
+            ->willReturn($stmt);
+
+        $stmt->expects($this->once())->method('bind_param')->with('ssi', $_POST['course'], $_POST['announcement_text'], $_SESSION['user_id']);
+        $stmt->expects($this->once())->method('execute')->willReturn(true);
+
+        // Capture the output
+        ob_start();
         createAnnouncement($this->conn, $_SESSION['user_id']);
-        $output = ob_get_clean();  // Get the output and end buffering
+        $output = ob_get_clean();
 
         // Assert the output matches expected success message
         $this->assertEquals("Announcement created successfully.", $output);
@@ -112,19 +115,25 @@ class TeacherTest extends TestCase
 
     public function testDeleteAnnouncementSuccess()
     {
-        // Mock the GET request data
+        // Mock GET request data
         $_GET['id'] = 1;
 
-        // Mock the prepared statement
+        // Create a mock statement object
         $stmt = $this->createMock(mysqli_stmt::class);
-        $stmt->expects($this->once())->method('bind_param');
-        $stmt->expects($this->once())->method('execute')->willReturn(true);
-        $this->conn->method('prepare')->willReturn($stmt);
 
-        // Call the deleteAnnouncement function
-        ob_start();  // Start output buffering to capture the output
+        // Mock the database interaction
+        $this->conn->expects($this->once())
+            ->method('prepare')
+            ->with($this->equalTo('DELETE FROM announcements WHERE id = ?'))
+            ->willReturn($stmt);
+
+        $stmt->expects($this->once())->method('bind_param')->with('i', $_GET['id']);
+        $stmt->expects($this->once())->method('execute')->willReturn(true);
+
+        // Capture the output
+        ob_start();
         deleteAnnouncement($this->conn);
-        $output = ob_get_clean();  // Get the output and end buffering
+        $output = ob_get_clean();
 
         // Assert the output matches expected success message
         $this->assertEquals("Announcement deleted successfully.", $output);
@@ -140,15 +149,9 @@ class TeacherTest extends TestCase
 
         ob_start();
         require "./source/get_teacher.php";
-        // Capture the output if the user is unauthorized
         $output = ob_get_clean();  // Capture the output and clean the buffer
 
         // Assert unauthorized message is displayed
         $this->assertEquals("Unauthorized access. Please login.", $output);
-
-        // Ensure the output buffer is cleaned up
-        if (ob_get_level() > 0) {
-            ob_end_clean();
-        }
     }
 }

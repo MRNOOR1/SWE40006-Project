@@ -2,6 +2,7 @@
 
 // Fetch courses for the logged-in teacher
 function fetchCourses($conn, $teacher_id) {
+
     $sql = "SELECT course_code, course_name FROM courses WHERE course_code IN (SELECT course_code FROM user_courses WHERE user_id = ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $teacher_id);
@@ -17,6 +18,7 @@ function fetchCourses($conn, $teacher_id) {
 
 // Fetch announcements for the teacher's courses
 function fetchAnnouncements($conn, $teacher_id) {
+    
     $sql = "SELECT id, course_code, text, time FROM announcements WHERE teacher_id = ? ORDER BY time DESC";
     $stmt = $conn->prepare($sql);
     
