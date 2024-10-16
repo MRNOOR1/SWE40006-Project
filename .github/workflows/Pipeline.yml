@@ -97,7 +97,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ec2-user@3.27.181.69 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ec2-user@3.106.144.102 << 'EOF'
             set -e
 
             cd /var/www/html/cicd-pipeline
