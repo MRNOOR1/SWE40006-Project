@@ -103,8 +103,8 @@ jobs:
             cd /var/www/html/cicd-pipeline
             
             echo "Pull the latest changes"
-            sudo git fetch origin
-            sudo git reset --hard origin/main
+            git fetch origin
+            git reset --hard origin/main
          
             echo "Update Composer dependencies"
             composer install --prefer-dist --no-progress
