@@ -2,7 +2,6 @@
 
 // Fetch courses for the logged-in teacher
 function fetchCourses($conn, $teacher_id) {
-    die("THIS SHOULD NOT WORK");
     $sql = "SELECT course_code, course_name FROM courses WHERE course_code IN (SELECT course_code FROM user_courses WHERE user_id = ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $teacher_id);
