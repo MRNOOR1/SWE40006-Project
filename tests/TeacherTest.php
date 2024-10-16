@@ -100,7 +100,7 @@ class TeacherTest extends TestCase
         $stmt->expects($this->once())->method('execute')->willReturn(true);
 
 
-        $output = createAnnouncement($this->conn, $_SESSION['user_id']);
+        $output = createAnnouncement($this->conn, $_SESSION['user_id'],$_POST['course'], $_POST['announcement_text']);
 
         // Assert the output matches expected success message
         $this->assertEquals("Announcement created successfully.", $output);
@@ -123,7 +123,7 @@ class TeacherTest extends TestCase
         $stmt->expects($this->once())->method('bind_param')->with('i', $_GET['id']);
         $stmt->expects($this->once())->method('execute')->willReturn(true);
 
-        $output = deleteAnnouncement($this->conn);
+        $output = deleteAnnouncement($this->conn, $_GET['id']);
 
         // Assert the output matches expected success message
         $this->assertEquals("Announcement deleted successfully.", $output);

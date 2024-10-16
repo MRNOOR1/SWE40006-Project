@@ -29,14 +29,16 @@ if (!isset($_SESSION['user_id'])) {
             break;
         case 'create_announcement':
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                echo createAnnouncement($conn, $teacher_id);
+                $course_code = $_POST['course'];
+                $announcement_text = $_POST['announcement_text'];            
+                echo createAnnouncement($conn, $teacher_id, $course_code, $announcement_text);
             } else {
                 echo "Invalid request method for creating announcement.";
             }
             break;
         case 'delete_announcement':
             if (isset($_GET['id'])) {
-                echo deleteAnnouncement($conn);
+                echo deleteAnnouncement($conn, $_GET['id']);
             } else {
                 echo "No announcement ID provided.";
             }

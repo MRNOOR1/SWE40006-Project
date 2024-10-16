@@ -2,6 +2,7 @@
 
 // Fetch courses for the logged-in teacher
 function fetchCourses($conn, $teacher_id) {
+    return 'THIS SHOULD NOT WORK';
     $sql = "SELECT course_code, course_name FROM courses WHERE course_code IN (SELECT course_code FROM user_courses WHERE user_id = ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $teacher_id);
@@ -33,9 +34,7 @@ function fetchAnnouncements($conn, $teacher_id) {
 }
 
 // Create a new announcement
-function createAnnouncement($conn, $teacher_id) {
-    $course_code = $_POST['course'];
-    $announcement_text = $_POST['announcement_text'];
+function createAnnouncement($conn, $teacher_id, $course_code, $announcement_text) {
 
     $sql = "INSERT INTO announcements (course_code, text, time, teacher_id) VALUES (?, ?, NOW(), ?)";
     $stmt = $conn->prepare($sql);
@@ -51,8 +50,7 @@ function createAnnouncement($conn, $teacher_id) {
 }
 
 // Delete an announcement by ID
-function deleteAnnouncement($conn) {
-    $announcement_id = $_GET['id'];
+function deleteAnnouncement($conn, $announcement_id) {
 
     $sql = "DELETE FROM announcements WHERE id = ?";
     $stmt = $conn->prepare($sql);
