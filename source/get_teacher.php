@@ -22,21 +22,21 @@ if (!isset($_SESSION['user_id'])) {
     // Route the request based on the action parameter
     switch ($action) {
         case 'get_courses':
-            fetchCourses($conn, $teacher_id);
+            echo fetchCourses($conn, $teacher_id);
             break;
         case 'get_announcements':
-            fetchAnnouncements($conn, $teacher_id);
+            echo fetchAnnouncements($conn, $teacher_id);
             break;
         case 'create_announcement':
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                createAnnouncement($conn, $teacher_id);
+                echo createAnnouncement($conn, $teacher_id);
             } else {
                 echo "Invalid request method for creating announcement.";
             }
             break;
         case 'delete_announcement':
             if (isset($_GET['id'])) {
-                deleteAnnouncement($conn);
+                echo deleteAnnouncement($conn);
             } else {
                 echo "No announcement ID provided.";
             }

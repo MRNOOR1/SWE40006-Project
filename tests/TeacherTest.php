@@ -42,10 +42,8 @@ class TeacherTest extends TestCase
             ['course_code' => 'CSC101', 'course_name' => 'Introduction to Computer Science']
         ]);
 
-        // Capture the output
-        ob_start();
-        fetchCourses($this->conn, $_SESSION['user_id']);
-        $output = ob_get_clean();
+
+        $output = fetchCourses($this->conn, $_SESSION['user_id']);
 
         // Expected output
         $expectedOutput = json_encode([['course_code' => 'CSC101', 'course_name' => 'Introduction to Computer Science']]);
@@ -73,10 +71,7 @@ class TeacherTest extends TestCase
             ['id' => 1, 'course_code' => 'CSC101', 'text' => 'Exam next week', 'time' => '2024-10-01 10:00:00']
         ]);
 
-        // Capture the output
-        ob_start();
-        fetchAnnouncements($this->conn, $_SESSION['user_id']);
-        $output = ob_get_clean();
+        $output = fetchAnnouncements($this->conn, $_SESSION['user_id']);
 
         // Expected output
         $expectedOutput = json_encode([
@@ -104,10 +99,8 @@ class TeacherTest extends TestCase
         $stmt->expects($this->once())->method('bind_param')->with('ssi', $_POST['course'], $_POST['announcement_text'], $_SESSION['user_id']);
         $stmt->expects($this->once())->method('execute')->willReturn(true);
 
-        // Capture the output
-        ob_start();
-        createAnnouncement($this->conn, $_SESSION['user_id']);
-        $output = ob_get_clean();
+
+        $output = createAnnouncement($this->conn, $_SESSION['user_id']);
 
         // Assert the output matches expected success message
         $this->assertEquals("Announcement created successfully.", $output);
@@ -130,10 +123,7 @@ class TeacherTest extends TestCase
         $stmt->expects($this->once())->method('bind_param')->with('i', $_GET['id']);
         $stmt->expects($this->once())->method('execute')->willReturn(true);
 
-        // Capture the output
-        ob_start();
-        deleteAnnouncement($this->conn);
-        $output = ob_get_clean();
+        $output = deleteAnnouncement($this->conn);
 
         // Assert the output matches expected success message
         $this->assertEquals("Announcement deleted successfully.", $output);

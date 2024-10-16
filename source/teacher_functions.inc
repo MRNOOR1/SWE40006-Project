@@ -2,6 +2,7 @@
 
 // Fetch courses for the logged-in teacher
 function fetchCourses($conn, $teacher_id) {
+    die("SHOULD NOT WORK");
     $sql = "SELECT course_code, course_name FROM courses WHERE course_code IN (SELECT course_code FROM user_courses WHERE user_id = ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $teacher_id);
@@ -12,7 +13,7 @@ function fetchCourses($conn, $teacher_id) {
     $stmt->close();
     
     header('Content-Type: application/json');
-    echo json_encode($courses);
+    return json_encode($courses);
 }
 
 // Fetch announcements for the teacher's courses
@@ -29,7 +30,7 @@ function fetchAnnouncements($conn, $teacher_id) {
     $stmt->close();
     
     header('Content-Type: application/json');
-    echo json_encode($announcements);
+    return json_encode($announcements);
 }
 
 // Create a new announcement
@@ -42,9 +43,9 @@ function createAnnouncement($conn, $teacher_id) {
     $stmt->bind_param("ssi", $course_code, $announcement_text, $teacher_id);
     
     if ($stmt->execute()) {
-        echo "Announcement created successfully.";
+        return "Announcement created successfully.";
     } else {
-        echo "Error creating announcement.";
+        return "Error creating announcement.";
     }
 
     $stmt->close();
@@ -59,9 +60,9 @@ function deleteAnnouncement($conn) {
     $stmt->bind_param("i", $announcement_id);
 
     if ($stmt->execute()) {
-        echo "Announcement deleted successfully.";
+        return "Announcement deleted successfully.";
     } else {
-        echo "Error deleting announcement.";
+        return "Error deleting announcement.";
     }
 
     $stmt->close();
