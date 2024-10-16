@@ -82,7 +82,7 @@ jobs:
           vendor/bin/phpunit --testdox --debug tests/ProcessTest.php
           vendor/bin/phpunit --testdox --debug tests/GetAnnouncementsTest.php
           vendor/bin/phpunit --testdox --debug tests/TeacherTest.php
-          continue-on-error: true
+        continue-on-error: true
 
       - name: Check Test Results and Send Message
         if: failure() # This step runs only if the previous one fails
