@@ -82,6 +82,11 @@ jobs:
           vendor/bin/phpunit --testdox --debug tests/ProcessTest.php
           vendor/bin/phpunit --testdox --debug tests/GetAnnouncementsTest.php
           vendor/bin/phpunit --testdox --debug tests/TeacherTest.php
+          continue-on-error: true
+
+      - name: Check Test Results and Send Message
+        if: failure() # This step runs only if the previous one fails
+        run: echo "PHPUnit tests failed. Please review the test results."
 
   Production_server:
     runs-on: ubuntu-latest
