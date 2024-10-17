@@ -108,11 +108,10 @@ jobs:
             cd /var/www/html/cicd-pipeline
             
             echo "Pull the latest changes"
-            git fetch origin
-            git reset --hard origin/main
+            git pull origin main
          
             echo "Update Composer dependencies"
-            composer install --prefer-dist --no-progress
+            composer install --prefer-dist --no-progress --no-dev
 
             echo "Restart web server"
             sudo systemctl restart httpd  
